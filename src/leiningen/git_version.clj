@@ -11,10 +11,13 @@
 
 (defn get-git-version
   []
-  (apply str (rest (clojure.string/trim
-                    (:out (sh
-                           "git" "describe" "--match" "v*.*"
-                           "--abbrev=4" "--dirty=**DIRTY**"))))))
+  (let [version (second (re-find #"release/(.*)"
+                         (clojure.string/trim
+                           (:out (sh
+                                   "git" "describe" "--tags" "--match" "release/*")))))]
+    (if (empty? version)
+      "0.0.0"
+      version)))
 
 (defn get-git-ref
   []
